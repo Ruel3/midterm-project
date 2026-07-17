@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USIU-Africa Health Centre Queue Manager</title>
+  <style>
+    /* --- CSS Custom Variables (USIU-Africa Color Palette) --- */
+    :root {
+      --usiu-blue: #003366;
+      --usiu-gold: #C5A059;
+      --usiu-light-blue: #E6F0FA;
+      --dark-neutral: #1A1A1A;
+      --light-neutral: #F8F9FA;
+      --success-green: #2E7D32;
+      --border-color: #DDE2E5;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-stack);
+    }
+
+    body {
+      background-color: #F0F2F5;
+      color: var(--dark-neutral);
+      line-height: 1.5;
+    }
+
+    /* --- Global Header & Role Toggle --- */
+    header {
+      background-color: var(--usiu-blue);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid var(--usiu-gold);
+    }
+
+    .logo-area h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-area span {
+      color: var(--usiu-gold);
+      font-size: 0.85rem;
+      display: block;
+    }
+
+    .view-toggle-btn {
+      background-color: transparent;
+      color: white;
+      border: 2px solid var(--usiu-gold);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .view-toggle-btn:hover {
+      background-color: var(--usiu-gold);
+      color: var(--usiu-blue);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* --- Common Component Styles --- */
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      color: var(--usiu-blue);
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--usiu-gold);
+      padding-left: 0.75rem;
+    }
+
+    /* --- View Switching Containers --- */
+    .view-container {
+      display: none;
+    }
+
+    .view-container.active {
+      display: block;
+    }
+
+    /* --- STUDENT PORTAL VIEW --- */
+    /* Login State */
+    .auth-form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .auth-form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .auth-form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .auth-form-group input:focus {
+      outline: none;
+      border-color: var(--usiu-blue);
+      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      background-color: var(--usiu-blue);
+      color: white;
+      border: none;
+      padding: 0.85rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #002244;
+    }
+
+    /* Department Selection Grid */
+    .dept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .dept-card {
+      background: var(--light-neutral);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .dept-card:hover {
+      border-color: var(--usiu-gold);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .dept-card h3 {
+      color: var(--usiu-blue);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dept-card p {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .dept-card .wait-indicator {
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: var(--usiu-gold);
+    }
+
+    /* Virtual Ticket UI */
+    .ticket-container {
+      max-width: 450px;
+      margin: 0 auto;
+      border: 2px dashed var(--usiu-gold);
+      border-radius: 16px;
+      background: white;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .ticket-dept {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--usiu-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .ticket-number {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--usiu-blue);
+      margin: 1rem 0;
+    }
+
+    .ticket-status-box {
+      background-color: var(--usiu-light-blue);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .ticket-status-box p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .ticket-status-box .status-highlight {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--usiu-blue);
+      margin-top: 0.25rem;
+    }
+
+    /* --- CLINIC STAFF DASHBOARD VIEW --- */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Staff Sidebar Navigation */
+    .staff-sidebar {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      height: fit-content;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li {
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #555;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-menu li:hover {
+      background-color: var(--usiu-light-blue);
+      color: var(--usiu-blue);
+    }
+
+    .sidebar-menu li.active {
+      background-color: var(--usiu-blue);
+      color: white;
+    }
+
+    /* Staff Center Console */
+    .workspace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .console-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .console-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Live Queue Tables */
+    .queue-table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: var(--light-neutral);
+      color: var(--usiu-blue);
+      font-weight: bold;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .status-pill.waiting {
+      background-color: #FFE0B2;
+      color: #E65100;
+    }
+
+    .status-pill.called {
+      background-color: var(--usiu-light-blue);
+      color: var(--usiu-blue);
+    }
+
+    /* Right Action Terminal */
+    .action-panel {
+      background-color: var(--light-neutral);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .current-call-card {
+      background: white;
+      border-left: 5px solid var(--usiu-gold);
+      padding: 1.25rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .current-call-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--usiu-blue);
+    }
+
+    .dropdown {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      font-size: 1rem;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Bar -->
+  <header>
+    <div class="logo-area">
+      <h1>USIU-Africa Health Centre</h1>
+      <span>Digital Queue System</span>
+    </div>
+    <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleRoleView()">Switch to Staff View</button>
+  </header>
+
+  <main>
+    <!-- ================= STUDENT PORTAL VIEW ================= -->
+    <div id="studentView" class="view-container active">
+      
+      <!-- Screen 1: Login Portal -->
+      <div id="studentLoginScreen" class="card" style="max-width: 480px; margin: 3rem auto;">
+        <h2 class="section-title">Student Secure Portal Login</h2>
+        <form id="loginForm" onsubmit="handleStudentLogin(event)">
+          <div class="auth-form-group">
+            <label for="studentNo">Student ID Number</label>
+            <input type="text" id="studentNo" placeholder="e.g., 669106" required>
+          </div>
+          <div class="auth-form-group">
+            <label for="studentName">Full Name</label>
+            <input type="text" id="studentName" placeholder="e.g., Shyaka Leonce" required>
+          </div>
+          <button type="submit" class="btn">Login & Select Service</button>
+        </form>
+      </div>
+
+      <!-- Screen 2: Select Department -->
+      <div id="studentDeptScreen" class="view-container">
+        <div class="card">
+          <h2 class="section-title">Select a Health Clinic Department</h2>
+          <p style="margin-bottom: 1.5rem; color: #555;">Choose the medical unit you wish to visit today. Your digital ticket will be generated instantly.</p>
+          <div class="dept-grid" id="deptGrid">
+            <!-- Rendered dynamically by Javascript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 3: Live Virtual Ticket -->
+      <div id="studentTicketScreen" class="view-container">
+        <div class="ticket-container">
+          <p class="ticket-dept" id="myTicketDept">General Consultation</p>
+          <div class="ticket-number" id="myTicketNumber">GEN-012</div>
+          
+          <div class="ticket-status-box">
+            <p>Current Active Ticket:</p>
+            <div class="status-highlight" id="activeTicketDisplay">GEN-010</div>
+          </div>
+
+          <p style="margin-bottom: 1.5rem; color: #666; font-size: 0.95rem;">
+            Estimated Waiting Time: <strong id="myWaitTime" style="color: var(--usiu-gold);">12 minutes</strong>
+          </p>
+          
+          <button class="btn" style="background-color: #c62828;" onclick="cancelMyTicket()">Leave Queue</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= CLINIC STAFF VIEW ================= -->
+    <div id="staffView" class="view-container">
+      <div class="dashboard-layout">
+        
+        <!-- Navigation Menu -->
+        <aside class="staff-sidebar">
+          <h3 style="color: var(--usiu-blue); margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; tracking: 0.5px;">Department Queues</h3>
+          <ul class="sidebar-menu" id="staffDeptMenu">
+            <!-- Loaded dynamically by Javascript -->
+          </ul>
+        </aside>
+
+        <!-- Command Deck -->
+        <section>
+          <div class="card" style="padding: 1.5rem;">
+            <div class="workspace-header">
+              <div>
+                <h2 style="color: var(--usiu-blue);" id="activeStaffDeptTitle">General Consultation</h2>
+                <p style="font-size: 0.85rem; color: #666;">Real-time management dashboard</p>
+              </div>
+            </div>
+
+            <div class="console-grid">
+              
+              <!-- Left: Wait List Table -->
+              <div class="queue-table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Token</th>
+                      <th>Student</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staffQueueTableBody">
+                    <!-- Live entries loaded here -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Right: Terminal Dispatches -->
+              <div class="action-panel">
+                <div class="current-call-card">
+                  <p style="font-size: 0.8rem; text-transform: uppercase; color: #666;">Now Calling</p>
+                  <div class="current-call-number" id="nowCallingToken">-</div>
+                  <p id="nowCallingStudentName" style="font-weight: 600; margin-top: 0.5rem; font-size: 0.95rem;">No active session</p>
+                </div>
+
+                <button class="btn" id="callNextBtn" onclick="callNextPatient()">Call Next Student</button>
+                
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--usiu-blue);">Assign Consultation Room</label>
+                <select class="dropdown" id="roomSelector" onchange="assignConsultationRoom()">
+                  <option value="">-- Choose consultation room --</option>
+                  <option value="Room 1">Room 1 (General Practitioner)</option>
+                  <option value="Room 2">Room 2 (Triage / Vitals)</option>
+                  <option value="Room 3">Room 3 (Lab Specimen Hub)</option>
+                  <option value="Room 4">Room 4 (Therapeutic / Counsel)</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= STATE ENGINE AND SIMULATION ENGINE ================= -->
+  <script>
+    // --- Application Constants (The Six Clinical Units) ---
+    const DEPARTMENTS = {
+      'GEN': { id: 'GEN', name: 'General Consultation', avgWait: 15 },
+      'TRI': { id: 'TRI', name: 'Triage & Nursing', avgWait: 5 },
+      'PHA': { id: 'PHA', name: 'Pharmacy', avgWait: 8 },
+      'LAB': { id: 'LAB', name: 'Laboratory Services', avgWait: 20 },
+      'DEN': { id: 'DEN', name: 'Dental Clinic', avgWait: 25 },
+      'CNS': { id: 'CNS', name: 'Counseling & Guidance', avgWait: 30 }
+    };
+
+    // --- In-Memory Application State Store ---
+    let appState = {
+      currentRole: 'student', // 'student' or 'staff'
+      currentUser: null,      // { studentNo, name }
+      currentStudentTicket: null, // { token, deptId, index }
+      activeStaffDept: 'GEN',
+      queues: {
+        'GEN': [
+          { token: 'GEN-010', name: 'Emmanuel Rukundo', status: 'called', room: 'Room 1' },
+          { token: 'GEN-011', name: 'Jane Wanjiku', status: 'waiting', room: '' },
+          { token: 'GEN-012', name: 'Kevin Kiprop', status: 'waiting', room: '' }
+        ],
+        'TRI': [
+          { token: 'TRI-004', name: 'Leonce Shyaka', status: 'waiting', room: '' }
+        ],
+        'PHA': [],
+        'LAB': [],
+        'DEN': [],
+        'CNS': []
+      }
+    };
+
+    // --- Start App ---
+    window.onload = function() {
+      renderStudentDepartments();
+      renderStaffDepartmentMenu();
+      syncStaffDashboard();
+    };
+
+    // --- Role Swapping Flow ---
+    function toggleRoleView() {
+      const isStudent = appState.currentRole === 'student';
+      appState.currentRole = isStudent ? 'staff' : 'student';
+
+      document.getElementById('viewToggleBtn').innerText = isStudent ? 'Switch to Student View' : 'Switch to Staff View';
+      
+      if (isStudent) {
+        document.getElementById('studentView').classList.remove('active');
+        document.getElementById('staffView').classList.add('active');
+        syncStaffDashboard();
+      } else {
+        document.getElementById('staffView').classList.remove('active');
+        document.getElementById('studentView').classList.add('active');
+        syncStudentProgressUI();
+      }
+    }
+
+    // --- Student User Flow Scripts ---
+    function handleStudentLogin(e) {
+      e.preventDefault();
+      const studentNo = document.getElementById('studentNo').value;
+      const name = document.getElementById('studentName').value;
+      
+      appState.currentUser = { studentNo, name };
+      
+      document.getElementById('studentLoginScreen').style.display = 'none';
+      document.getElementById('studentDeptScreen').classList.add('active');
+    }
+
+    function renderStudentDepartments() {
+      const grid = document.getElementById('deptGrid');
+      grid.innerHTML = '';
+      
+      Object.values(DEPARTMENTS).forEach(dept => {
+        const queueSize = appState.queues[dept.id].filter(p => p.status === 'waiting').length;
+        const totalWait = queueSize * dept.avgWait;
+
+        const card = document.createElement('div');
+        card.className = 'dept-card';
+        card.onclick = () => joinQueue(dept.id);
+        card.innerHTML = `
+          <div>
+            <h3>${dept.name}</h3>
+            <p>Register and clear with the triage team at this desk.</p>
+          </div>
+          <div class="wait-indicator">
+            ${queueSize} in queue (~${totalWait} mins wait)
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function joinQueue(deptId) {
+      if (!appState.currentUser) return;
+      
+      const deptList = appState.queues[deptId];
+      const nextNum = deptList.length + 1;
+      const formattedToken = `${deptId}-${nextNum.toString().padStart(3, '0')}`;
+      
+      const newEntry = {
+        token: formattedToken,
+        name: appState.currentUser.name,
+        status: 'waiting',
+        room: ''
+      };
+
+      appState.queues[deptId].push(newEntry);
+      appState.currentStudentTicket = {
+        token: formattedToken,
+        deptId: deptId
+      };
+
+      renderStudentDepartments();
+      syncStudentProgressUI();
+      
+      document.getElementById('studentDeptScreen').classList.remove('active');
+      document.getElementById('studentTicketScreen').classList.add('active');
+    }
+
+    function syncStudentProgressUI() {
+      if (!appState.currentStudentTicket) {
+        document.getElementById('studentDeptScreen').classList.add('active');
+        document.getElementById('studentTicketScreen').classList.remove('active');
+        return;
+      }
+
+      const { token, deptId } = appState.currentStudentTicket;
+      const deptList = appState.queues[deptId];
+      const myIndex = deptList.findIndex(p => p.token === token);
+      
+      if (myIndex === -1) return;
+      
+      const ticketInfo = deptList[myIndex];
+      const calledItem = deptList.find(p => p.status === 'called');
+
+      document.getElementById('myTicketDept').innerText = DEPARTMENTS[deptId].name;
+      document.getElementById('myTicketNumber').innerText = token;
+      document.getElementById('activeTicketDisplay').innerText = calledItem ? calledItem.token : 'None';
+      
+      // Calculate individual position waiting times
+      const waitingAhead = deptList.slice(0, myIndex).filter(p => p.status === 'waiting').length;
+      
+      if (ticketInfo.status === 'called') {
+        document.getElementById('myWaitTime').innerHTML = `<span style="color: var(--success-green);">Called to ${ticketInfo.room || 'Station'}!</span>`;
+      } else {
+        document.getElementById('myWaitTime').innerText = `${waitingAhead * DEPARTMENTS[deptId].avgWait} minutes (${waitingAhead} ahead of you)`;
+      }
+    }
+
+    function cancelMyTicket() {
+      if (!appState.currentStudentTicket) return;
+      
+      const { token, deptId } = appState.currentStudentTicket;
+      appState.queues[deptId] = appState.queues[deptId].filter(p => p.token !== token);
+      appState.currentStudentTicket = null;
+
+      renderStudentDepartments();
+      
+      document.getElementById('studentTicketScreen').classList.remove('active');
+      document.getElementById('studentDeptScreen').classList.add('active');
+    }
+
+    // --- Staff View Action Scripts ---
+    function renderStaffDepartmentMenu() {
+      const menu = document.getElementById('staffDeptMenu');
+      menu.innerHTML = '';
+      
+      Object.values(DEPARTMENTS).forEach(dept => {
+        const item = document.createElement('li');
+        item.innerText = dept.name;
+        item.className = dept.id === appState.activeStaffDept ? 'active' : '';
+        item.onclick = () => selectStaffDepartment(dept.id);
+        menu.appendChild(item);
+      });
+    }
+
+    function selectStaffDepartment(deptId) {
+      appState.activeStaffDept = deptId;
+      renderStaffDepartmentMenu();
+      syncStaffDashboard();
+    }
+
+    function syncStaffDashboard() {
+      const deptId = appState.activeStaffDept;
+      document.getElementById('activeStaffDeptTitle').innerText = DEPARTMENTS[deptId].name;
+      
+      const deptList = appState.queues[deptId];
+      const tableBody = document.getElementById('staffQueueTableBody');
+      tableBody.innerHTML = '';
+
+      if (deptList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #888;">No students in queue currently.</td></tr>`;
+      } else {
+        deptList.forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><strong>${p.token}</strong></td>
+            <td>${p.name}</td>
+            <td><span class="status-pill ${p.status}">${p.status.toUpperCase()}</span></td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Check for an currently active called patient
+      const activeCall = deptList.find(p => p.status === 'called');
+      if (activeCall) {
+        document.getElementById('nowCallingToken').innerText = activeCall.token;
+        document.getElementById('nowCallingStudentName').innerText = activeCall.name;
+        document.getElementById('roomSelector').value = activeCall.room || "";
+      } else {
+        document.getElementById('nowCallingToken').innerText = '-';
+        document.getElementById('nowCallingStudentName').innerText = 'No active session';
+        document.getElementById('roomSelector').value = "";
+      }
+    }
+
+    function callNextPatient() {
+      const deptId = appState.activeStaffDept;
+      const deptList = appState.queues[deptId];
+      
+      // Auto complete the previous call
+      const activeCallIndex = deptList.findIndex(p => p.status === 'called');
+      if (activeCallIndex !== -1) {
+        deptList[activeCallIndex].status = 'completed';
+      }
+
+      // Find the next waiting patient
+      const nextPatientIndex = deptList.findIndex(p => p.status === 'waiting');
+      if (nextPatientIndex !== -1) {
+        deptList[nextPatientIndex].status = 'called';
+      } else {
+        alert("No remaining patients waiting in this queue!");
+      }
+
+      syncStaffDashboard();
+    }
+
+    function assignConsultationRoom() {
+      const deptId = appState.activeStaffDept;
+      const deptList = appState.queues[deptId];
+      const room = document.getElementById('roomSelector').value;
+      
+      const activeCallIndex = deptList.findIndex(p => p.status === 'called');
+      if (activeCallIndex !== -1) {
+        deptList[activeCallIndex].room = room;
+      }
+      
+      syncStaffDashboard();
+    }
+  </script>
+</body>
+</html>
