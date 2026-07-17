@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>USIU-Africa Health Centre Queue Manager</title>
   <style>
-    /* --- CSS Custom Variables (USIU-Africa Color Palette) --- */
+    /* --- CSS Custom Variables (Yellow-Dominant USIU-Africa Palette) --- */
     :root {
-      --usiu-blue: #003366;
-      --usiu-gold: #C5A059;
-      --usiu-light-blue: #E6F0FA;
+      --usiu-yellow: #F4C430;      /* Dominant vibrant gold/yellow */
+      --usiu-gold-dark: #C5A059;   /* Traditional deep gold */
+      --usiu-blue: #003366;        /* Deep blue for high-contrast text & borders */
+      --usiu-light-yellow: #FFFBE6;/* Warm, very light cream/yellow for soft panels */
       --dark-neutral: #1A1A1A;
-      --light-neutral: #F8F9FA;
-      --success-green: #2E7D32;
-      --danger-red: #c62828;
-      --border-color: #DDE2E5;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --light-neutral: #FFFFFF;    /* Clean white */
+      --success-green: #1B5E20;
+      --danger-red: #B71C1C;
+      --border-color: #EED6A5;     /* Warm golden-yellow border */
+      --shadow: 0 4px 12px rgba(197, 160, 89, 0.15);
       --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -27,32 +28,35 @@
     }
 
     body {
-      background-color: #F0F2F5;
+      background-color: #FAF8F2;   /* Soft warm background */
       color: var(--dark-neutral);
       line-height: 1.5;
     }
 
-    /* --- Global Header & Role Toggle --- */
+    /* --- Global Header (Now Yellow-Dominant) --- */
     header {
-      background-color: var(--usiu-blue);
-      color: white;
+      background-color: var(--usiu-yellow);
+      color: var(--usiu-blue);
       padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 4px solid var(--usiu-gold);
+      border-bottom: 4px solid var(--usiu-blue);
+      box-shadow: var(--shadow);
     }
 
     .logo-area h1 {
       font-size: 1.3rem;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.5px;
     }
 
     .logo-area span {
-      color: var(--usiu-gold);
+      color: var(--usiu-blue);
+      font-weight: 600;
       font-size: 0.85rem;
       display: block;
+      opacity: 0.85;
     }
 
     .header-actions {
@@ -62,28 +66,28 @@
     }
 
     .view-toggle-btn {
-      background-color: transparent;
+      background-color: var(--usiu-blue);
       color: white;
-      border: 2px solid var(--usiu-gold);
+      border: 2px solid var(--usiu-blue);
       padding: 0.5rem 1rem;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .view-toggle-btn:hover {
-      background-color: var(--usiu-gold);
+      background-color: transparent;
       color: var(--usiu-blue);
     }
 
     .logout-btn {
       background-color: transparent;
-      color: #FFCDD2;
-      border: 1px solid var(--danger-red);
+      color: var(--danger-red);
+      border: 2px solid var(--danger-red);
       padding: 0.5rem 1rem;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -101,10 +105,10 @@
 
     /* --- Common Component Styles --- */
     .card {
-      background: white;
+      background: var(--light-neutral);
       border-radius: 12px;
       box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       padding: 2rem;
       margin-bottom: 2rem;
     }
@@ -121,7 +125,7 @@
     .section-title {
       font-size: 1.25rem;
       color: var(--usiu-blue);
-      border-left: 4px solid var(--usiu-gold);
+      border-left: 5px solid var(--usiu-yellow);
       padding-left: 0.75rem;
     }
 
@@ -135,7 +139,6 @@
     }
 
     /* --- STUDENT PORTAL VIEW --- */
-    /* Login State */
     .auth-form-group {
       margin-bottom: 1.25rem;
     }
@@ -143,41 +146,60 @@
     .auth-form-group label {
       display: block;
       margin-bottom: 0.5rem;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.9rem;
+      color: var(--usiu-blue);
     }
 
     .auth-form-group input {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       border-radius: 6px;
       font-size: 1rem;
+      background-color: #FFFDF9;
     }
 
     .auth-form-group input:focus {
       outline: none;
-      border-color: var(--usiu-blue);
-      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+      border-color: var(--usiu-yellow);
+      box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.25);
     }
 
+    .toggle-auth-link {
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+      color: var(--usiu-blue);
+      font-size: 0.9rem;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .toggle-auth-link:hover {
+      text-decoration: underline;
+      color: var(--usiu-gold-dark);
+    }
+
+    /* Primary Yellow Action Buttons */
     .btn {
       display: inline-block;
       width: 100%;
-      background-color: var(--usiu-blue);
-      color: white;
-      border: none;
+      background-color: var(--usiu-yellow);
+      color: var(--usiu-blue);
+      border: 2px solid var(--usiu-blue);
       padding: 0.85rem;
       border-radius: 6px;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       text-align: center;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
     }
 
     .btn:hover {
-      background-color: #002244;
+      background-color: var(--usiu-blue);
+      color: white;
     }
 
     /* Department Selection Grid */
@@ -189,7 +211,7 @@
     }
 
     .dept-card {
-      background: var(--light-neutral);
+      background: var(--usiu-light-yellow);
       border: 2px solid var(--border-color);
       border-radius: 10px;
       padding: 1.5rem;
@@ -201,7 +223,8 @@
     }
 
     .dept-card:hover {
-      border-color: var(--usiu-gold);
+      border-color: var(--usiu-blue);
+      background-color: #FFF9D6;
       transform: translateY(-2px);
       box-shadow: var(--shadow);
     }
@@ -214,26 +237,32 @@
 
     .dept-card p {
       font-size: 0.85rem;
-      color: #666;
+      color: #555;
     }
 
     .dept-card .wait-indicator {
       margin-top: 1rem;
-      font-weight: bold;
+      font-weight: 800;
       font-size: 0.9rem;
-      color: var(--usiu-gold);
+      color: var(--usiu-blue);
+      background: var(--usiu-yellow);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      text-align: center;
+      border: 1px solid var(--usiu-blue);
     }
 
     /* Virtual Ticket UI */
     .ticket-container {
       max-width: 450px;
       margin: 0 auto;
-      border: 2px dashed var(--usiu-gold);
+      border: 3px dashed var(--usiu-yellow);
       border-radius: 16px;
       background: white;
       padding: 2.5rem 2rem;
       text-align: center;
       position: relative;
+      box-shadow: var(--shadow);
     }
 
     .ticket-dept {
@@ -246,16 +275,21 @@
 
     .ticket-number {
       font-size: 3.5rem;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--usiu-blue);
       margin: 1rem 0;
+      background: var(--usiu-yellow);
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 2px solid var(--usiu-blue);
     }
 
     .ticket-status-box {
-      background-color: var(--usiu-light-blue);
+      background-color: var(--usiu-light-yellow);
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
     }
 
     .ticket-status-box p {
@@ -265,7 +299,7 @@
 
     .ticket-status-box .status-highlight {
       font-size: 1.4rem;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--usiu-blue);
       margin-top: 0.25rem;
     }
@@ -293,9 +327,10 @@
     .staff-sidebar {
       background: white;
       border-radius: 12px;
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       padding: 1.5rem;
       height: fit-content;
+      box-shadow: var(--shadow);
     }
 
     .sidebar-menu {
@@ -307,19 +342,20 @@
       margin-bottom: 0.5rem;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
       color: #555;
       transition: all 0.2s ease;
     }
 
     .sidebar-menu li:hover {
-      background-color: var(--usiu-light-blue);
+      background-color: var(--usiu-light-yellow);
       color: var(--usiu-blue);
     }
 
     .sidebar-menu li.active {
-      background-color: var(--usiu-blue);
-      color: white;
+      background-color: var(--usiu-yellow);
+      color: var(--usiu-blue);
+      border: 2px solid var(--usiu-blue);
     }
 
     /* Staff Center Console */
@@ -361,9 +397,9 @@
     }
 
     th {
-      background-color: var(--light-neutral);
+      background-color: var(--usiu-light-yellow);
       color: var(--usiu-blue);
-      font-weight: bold;
+      font-weight: 800;
     }
 
     .status-pill {
@@ -375,19 +411,20 @@
     }
 
     .status-pill.waiting {
-      background-color: #FFE0B2;
-      color: #E65100;
+      background-color: var(--usiu-yellow);
+      color: var(--usiu-blue);
+      border: 1px solid var(--usiu-blue);
     }
 
     .status-pill.called {
-      background-color: var(--usiu-light-blue);
-      color: var(--usiu-blue);
+      background-color: var(--usiu-blue);
+      color: white;
     }
 
     /* Right Action Terminal */
     .action-panel {
-      background-color: var(--light-neutral);
-      border: 1px solid var(--border-color);
+      background-color: var(--usiu-light-yellow);
+      border: 2px solid var(--border-color);
       border-radius: 8px;
       padding: 1.5rem;
       display: flex;
@@ -397,15 +434,17 @@
 
     .current-call-card {
       background: white;
-      border-left: 5px solid var(--usiu-gold);
+      border: 2px solid var(--usiu-blue);
+      border-top: 8px solid var(--usiu-yellow);
       padding: 1.25rem;
       border-radius: 6px;
       text-align: center;
+      box-shadow: var(--shadow);
     }
 
     .current-call-number {
       font-size: 2.5rem;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--usiu-blue);
     }
 
@@ -413,7 +452,7 @@
       width: 100%;
       padding: 0.75rem;
       border-radius: 6px;
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--border-color);
       font-size: 1rem;
       background-color: white;
     }
@@ -428,7 +467,6 @@
       <span>Digital Queue System</span>
     </div>
     <div class="header-actions">
-      <!-- Dynamic Global Logout button inside the header bar (rendered optionally) -->
       <button class="logout-btn" id="headerLogoutBtn" style="display: none;" onclick="logoutStudent()">Logout</button>
       <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleRoleView()">Switch to Staff View</button>
     </div>
@@ -438,7 +476,7 @@
     <!-- ================= STUDENT PORTAL VIEW ================= -->
     <div id="studentView" class="view-container active">
       
-      <!-- Screen 1: Login Portal -->
+      <!-- Screen 1A: Login Portal -->
       <div id="studentLoginScreen" class="card" style="max-width: 480px; margin: 3rem auto;">
         <h2 class="section-title" style="margin-bottom: 1.5rem;">Student Secure Portal Login</h2>
         <form id="loginForm" onsubmit="handleStudentLogin(event)">
@@ -447,10 +485,32 @@
             <input type="text" id="studentNo" placeholder="e.g., 669106" required>
           </div>
           <div class="auth-form-group">
-            <label for="studentName">Full Name</label>
-            <input type="text" id="studentName" placeholder="e.g., Shyaka Leonce" required>
+            <label for="studentPassword">Password</label>
+            <input type="password" id="studentPassword" placeholder="••••••••" required>
           </div>
           <button type="submit" class="btn">Login & Select Service</button>
+          <a href="#" class="toggle-auth-link" onclick="showRegistrationScreen(event)">Don't have an account? Register here</a>
+        </form>
+      </div>
+
+      <!-- Screen 1B: Registration Portal -->
+      <div id="studentRegisterScreen" class="card" style="max-width: 480px; margin: 3rem auto; display: none;">
+        <h2 class="section-title" style="margin-bottom: 1.5rem;">Student Registration</h2>
+        <form id="registerForm" onsubmit="handleStudentRegistration(event)">
+          <div class="auth-form-group">
+            <label for="regStudentNo">Student ID Number</label>
+            <input type="text" id="regStudentNo" placeholder="e.g., 669106" required>
+          </div>
+          <div class="auth-form-group">
+            <label for="regStudentName">Full Name</label>
+            <input type="text" id="regStudentName" placeholder="e.g., Shyaka Leonce" required>
+          </div>
+          <div class="auth-form-group">
+            <label for="regStudentPassword">Password</label>
+            <input type="password" id="regStudentPassword" placeholder="Create secure password" required>
+          </div>
+          <button type="submit" class="btn">Register Account</button>
+          <a href="#" class="toggle-auth-link" onclick="showLoginScreen(event)">Already registered? Log in here</a>
         </form>
       </div>
 
@@ -459,7 +519,6 @@
         <div class="card">
           <div class="section-header-container">
             <h2 class="section-title">Select a Health Clinic Department</h2>
-            <!-- Contextual Logout inside selection workspace -->
             <button class="logout-btn" onclick="logoutStudent()">Logout Session</button>
           </div>
           <p style="margin-bottom: 1.5rem; color: #555;">Choose the medical unit you wish to visit today. Your digital ticket will be generated instantly.</p>
@@ -480,13 +539,13 @@
             <div class="status-highlight" id="activeTicketDisplay">GEN-010</div>
           </div>
 
-          <p style="margin-bottom: 1.5rem; color: #666; font-size: 0.95rem;">
-            Estimated Waiting Time: <strong id="myWaitTime" style="color: var(--usiu-gold);">12 minutes</strong>
+          <p style="margin-bottom: 1.5rem; color: #333; font-size: 0.95rem;">
+            Estimated Waiting Time: <strong id="myWaitTime" style="color: var(--usiu-blue);">12 minutes</strong>
           </p>
           
           <div class="ticket-action-row">
-            <button class="btn" style="background-color: var(--danger-red);" onclick="cancelMyTicket()">Leave Queue</button>
-            <button class="btn" style="background-color: #555;" onclick="logoutStudent()">Logout Session</button>
+            <button class="btn" style="background-color: var(--danger-red); color: white; border-color: var(--danger-red);" onclick="cancelMyTicket()">Leave Queue</button>
+            <button class="btn" style="background-color: #555; color: white; border-color: #555;" onclick="logoutStudent()">Logout Session</button>
           </div>
         </div>
       </div>
@@ -499,7 +558,7 @@
         
         <!-- Navigation Menu -->
         <aside class="staff-sidebar">
-          <h3 style="color: var(--usiu-blue); margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Department Queues</h3>
+          <h3 style="color: var(--usiu-blue); margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--usiu-yellow); padding-bottom: 0.5rem;">Department Queues</h3>
           <ul class="sidebar-menu" id="staffDeptMenu">
             <!-- Loaded dynamically by Javascript -->
           </ul>
@@ -536,14 +595,14 @@
               <!-- Right: Terminal Dispatches -->
               <div class="action-panel">
                 <div class="current-call-card">
-                  <p style="font-size: 0.8rem; text-transform: uppercase; color: #666;">Now Calling</p>
+                  <p style="font-size: 0.8rem; text-transform: uppercase; color: #666; font-weight: bold;">Now Calling</p>
                   <div class="current-call-number" id="nowCallingToken">-</div>
-                  <p id="nowCallingStudentName" style="font-weight: 600; margin-top: 0.5rem; font-size: 0.95rem;">No active session</p>
+                  <p id="nowCallingStudentName" style="font-weight: 700; color: var(--usiu-blue); margin-top: 0.5rem; font-size: 0.95rem;">No active session</p>
                 </div>
 
                 <button class="btn" id="callNextBtn" onclick="callNextPatient()">Call Next Student</button>
                 
-                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                <hr style="border: none; border-top: 2px solid var(--border-color); margin: 0.5rem 0;">
 
                 <label style="font-size: 0.85rem; font-weight: bold; color: var(--usiu-blue);">Assign Consultation Room</label>
                 <select class="dropdown" id="roomSelector" onchange="assignConsultationRoom()">
@@ -573,6 +632,11 @@
       'LAB': { id: 'LAB', name: 'Laboratory Services', avgWait: 20 },
       'DEN': { id: 'DEN', name: 'Dental Clinic', avgWait: 25 },
       'CNS': { id: 'CNS', name: 'Counseling & Guidance', avgWait: 30 }
+    };
+
+    // --- Mock User Account Database ---
+    let studentDatabase = {
+      '669106': { name: 'Shyaka Leonce', password: 'password123' }
     };
 
     // --- In-Memory Application State Store ---
@@ -623,19 +687,64 @@
       }
     }
 
-    // --- Student User Flow Scripts ---
+    // --- Form Toggle Navigation Helpers ---
+    function showRegistrationScreen(e) {
+      if (e) e.preventDefault();
+      document.getElementById('studentLoginScreen').style.display = 'none';
+      document.getElementById('studentRegisterScreen').style.display = 'block';
+    }
+
+    // Show Login
+    function showLoginScreen(e) {
+      if (e) e.preventDefault();
+      document.getElementById('studentRegisterScreen').style.display = 'none';
+      document.getElementById('studentLoginScreen').style.display = 'block';
+    }
+
+    // --- Student Registration Flow ---
+    function handleStudentRegistration(e) {
+      e.preventDefault();
+      const studentNo = document.getElementById('regStudentNo').value.trim();
+      const name = document.getElementById('regStudentName').value.trim();
+      const password = document.getElementById('regStudentPassword').value;
+
+      if (studentDatabase[studentNo]) {
+        alert("This Student ID is already registered! Please log in.");
+        return;
+      }
+
+      // Save to mock DB
+      studentDatabase[studentNo] = { name, password };
+      
+      alert("Registration successful! You can now log in.");
+      
+      // Clean form inputs
+      document.getElementById('regStudentNo').value = '';
+      document.getElementById('regStudentName').value = '';
+      document.getElementById('regStudentPassword').value = '';
+      
+      showLoginScreen();
+    }
+
+    // --- Student Login Flow ---
     function handleStudentLogin(e) {
       e.preventDefault();
-      const studentNo = document.getElementById('studentNo').value;
-      const name = document.getElementById('studentName').value;
+      const studentNo = document.getElementById('studentNo').value.trim();
+      const password = document.getElementById('studentPassword').value;
       
-      appState.currentUser = { studentNo, name };
-      
-      document.getElementById('studentLoginScreen').style.display = 'none';
-      document.getElementById('studentDeptScreen').classList.add('active');
-      
-      // Update dynamic header logout visibility
-      document.getElementById('headerLogoutBtn').style.display = 'block';
+      const registeredUser = studentDatabase[studentNo];
+
+      if (registeredUser && registeredUser.password === password) {
+        appState.currentUser = { studentNo, name: registeredUser.name };
+        
+        document.getElementById('studentLoginScreen').style.display = 'none';
+        document.getElementById('studentDeptScreen').classList.add('active');
+        
+        // Update dynamic header logout visibility
+        document.getElementById('headerLogoutBtn').style.display = 'block';
+      } else {
+        alert("Invalid Student ID or password. Please try again.");
+      }
     }
 
     function logoutStudent() {
@@ -651,7 +760,7 @@
 
       // Clean Forms
       document.getElementById('studentNo').value = '';
-      document.getElementById('studentName').value = '';
+      document.getElementById('studentPassword').value = '';
 
       // Toggle views back to student registration screen
       document.getElementById('studentDeptScreen').classList.remove('active');
@@ -749,7 +858,7 @@
       const waitingAhead = deptList.slice(0, myIndex).filter(p => p.status === 'waiting').length;
       
       if (ticketInfo.status === 'called') {
-        document.getElementById('myWaitTime').innerHTML = `<span style="color: var(--success-green);">Called to ${ticketInfo.room || 'Station'}!</span>`;
+        document.getElementById('myWaitTime').innerHTML = `<span style="color: var(--success-green); font-weight: bold;">Called to ${ticketInfo.room || 'Station'}!</span>`;
       } else {
         document.getElementById('myWaitTime').innerText = `${waitingAhead * DEPARTMENTS[deptId].avgWait} minutes (${waitingAhead} ahead of you)`;
       }
