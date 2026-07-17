@@ -13,6 +13,7 @@
       --dark-neutral: #1A1A1A;
       --light-neutral: #F8F9FA;
       --success-green: #2E7D32;
+      --danger-red: #c62828;
       --border-color: #DDE2E5;
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -54,6 +55,12 @@
       display: block;
     }
 
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
     .view-toggle-btn {
       background-color: transparent;
       color: white;
@@ -68,6 +75,22 @@
     .view-toggle-btn:hover {
       background-color: var(--usiu-gold);
       color: var(--usiu-blue);
+    }
+
+    .logout-btn {
+      background-color: transparent;
+      color: #FFCDD2;
+      border: 1px solid var(--danger-red);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: var(--danger-red);
+      color: white;
     }
 
     main {
@@ -86,10 +109,18 @@
       margin-bottom: 2rem;
     }
 
+    .section-header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
     .section-title {
       font-size: 1.25rem;
       color: var(--usiu-blue);
-      margin-bottom: 1.5rem;
       border-left: 4px solid var(--usiu-gold);
       padding-left: 0.75rem;
     }
@@ -237,6 +268,12 @@
       font-weight: 700;
       color: var(--usiu-blue);
       margin-top: 0.25rem;
+    }
+
+    .ticket-action-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
     }
 
     /* --- CLINIC STAFF DASHBOARD VIEW --- */
@@ -390,7 +427,11 @@
       <h1>USIU-Africa Health Centre</h1>
       <span>Digital Queue System</span>
     </div>
-    <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleRoleView()">Switch to Staff View</button>
+    <div class="header-actions">
+      <!-- Dynamic Global Logout button inside the header bar (rendered optionally) -->
+      <button class="logout-btn" id="headerLogoutBtn" style="display: none;" onclick="logoutStudent()">Logout</button>
+      <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleRoleView()">Switch to Staff View</button>
+    </div>
   </header>
 
   <main>
@@ -399,7 +440,7 @@
       
       <!-- Screen 1: Login Portal -->
       <div id="studentLoginScreen" class="card" style="max-width: 480px; margin: 3rem auto;">
-        <h2 class="section-title">Student Secure Portal Login</h2>
+        <h2 class="section-title" style="margin-bottom: 1.5rem;">Student Secure Portal Login</h2>
         <form id="loginForm" onsubmit="handleStudentLogin(event)">
           <div class="auth-form-group">
             <label for="studentNo">Student ID Number</label>
@@ -416,7 +457,11 @@
       <!-- Screen 2: Select Department -->
       <div id="studentDeptScreen" class="view-container">
         <div class="card">
-          <h2 class="section-title">Select a Health Clinic Department</h2>
+          <div class="section-header-container">
+            <h2 class="section-title">Select a Health Clinic Department</h2>
+            <!-- Contextual Logout inside selection workspace -->
+            <button class="logout-btn" onclick="logoutStudent()">Logout Session</button>
+          </div>
           <p style="margin-bottom: 1.5rem; color: #555;">Choose the medical unit you wish to visit today. Your digital ticket will be generated instantly.</p>
           <div class="dept-grid" id="deptGrid">
             <!-- Rendered dynamically by Javascript -->
@@ -439,7 +484,10 @@
             Estimated Waiting Time: <strong id="myWaitTime" style="color: var(--usiu-gold);">12 minutes</strong>
           </p>
           
-          <button class="btn" style="background-color: #c62828;" onclick="cancelMyTicket()">Leave Queue</button>
+          <div class="ticket-action-row">
+            <button class="btn" style="background-color: var(--danger-red);" onclick="cancelMyTicket()">Leave Queue</button>
+            <button class="btn" style="background-color: #555;" onclick="logoutStudent()">Logout Session</button>
+          </div>
         </div>
       </div>
 
@@ -451,7 +499,7 @@
         
         <!-- Navigation Menu -->
         <aside class="staff-sidebar">
-          <h3 style="color: var(--usiu-blue); margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; tracking: 0.5px;">Department Queues</h3>
+          <h3 style="color: var(--usiu-blue); margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Department Queues</h3>
           <ul class="sidebar-menu" id="staffDeptMenu">
             <!-- Loaded dynamically by Javascript -->
           </ul>
@@ -566,6 +614,7 @@
       if (isStudent) {
         document.getElementById('studentView').classList.remove('active');
         document.getElementById('staffView').classList.add('active');
+        document.getElementById('headerLogoutBtn').style.display = 'none'; // Hide header logout on staff view
         syncStaffDashboard();
       } else {
         document.getElementById('staffView').classList.remove('active');
@@ -584,6 +633,34 @@
       
       document.getElementById('studentLoginScreen').style.display = 'none';
       document.getElementById('studentDeptScreen').classList.add('active');
+      
+      // Update dynamic header logout visibility
+      document.getElementById('headerLogoutBtn').style.display = 'block';
+    }
+
+    function logoutStudent() {
+      // Safety step: If the student is currently waiting in a queue, remove them when logging out
+      if (appState.currentStudentTicket) {
+        const { token, deptId } = appState.currentStudentTicket;
+        appState.queues[deptId] = appState.queues[deptId].filter(p => p.token !== token);
+        appState.currentStudentTicket = null;
+      }
+
+      // Flush User State
+      appState.currentUser = null;
+
+      // Clean Forms
+      document.getElementById('studentNo').value = '';
+      document.getElementById('studentName').value = '';
+
+      // Toggle views back to student registration screen
+      document.getElementById('studentDeptScreen').classList.remove('active');
+      document.getElementById('studentTicketScreen').classList.remove('active');
+      document.getElementById('studentLoginScreen').style.display = 'block';
+      document.getElementById('headerLogoutBtn').style.display = 'none';
+
+      // Redraw UI to reflect queue changes
+      renderStudentDepartments();
     }
 
     function renderStudentDepartments() {
@@ -638,8 +715,19 @@
     }
 
     function syncStudentProgressUI() {
+      // Toggle top header logout visibility depending on user's logged-in state
+      if (appState.currentRole === 'student' && appState.currentUser) {
+        document.getElementById('headerLogoutBtn').style.display = 'block';
+      } else {
+        document.getElementById('headerLogoutBtn').style.display = 'none';
+      }
+
       if (!appState.currentStudentTicket) {
-        document.getElementById('studentDeptScreen').classList.add('active');
+        if (appState.currentUser) {
+          document.getElementById('studentDeptScreen').classList.add('active');
+        } else {
+          document.getElementById('studentLoginScreen').style.display = 'block';
+        }
         document.getElementById('studentTicketScreen').classList.remove('active');
         return;
       }
